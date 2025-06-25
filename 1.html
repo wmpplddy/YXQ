@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>产品图片查看&价格统计</title>
+    <style>
+      body {
+        margin: 0;
+        background: #f7f7f7;
+        font-family: "Segoe UI", "PingFang SC", Arial, sans-serif;
+        color: #222;
+      }
+      .toast {
+        position: fixed;
+        left: 50%;
+        top: 10%;
+        transform: translateX(-50%);
+        background: #222;
+        color: #fff;
+        padding: 1rem 2.2rem;
+        border-radius: 2rem;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .toast.show {
+        opacity: 1;
+        pointer-events: auto;
+        animation: toastInOut 2s;
+      }
+      @keyframes toastInOut {
+        0% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-20px);
+        }
+        10% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        90% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-20px);
+        }
+      }
+      .single-copy-btn {
+        background: #fff;
+        color: #222;
+        border: 1.5px solid #222;
+        border-radius: 1.5em;
+        font-size: 1em;
+        font-weight: bold;
+        padding: 0.35em 1.3em;
+        cursor: pointer;
+        transition: background 0.18s, color 0.18s, border 0.18s;
+      }
+      .single-copy-btn:hover,
+      .single-copy-btn:active {
+        background: #222;
+        color: #fff;
+        border: 1.5px solid #222;
+      }
+      .container {
+        max-width: 520px;
+        margin: 1.5rem auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 1rem 1rem 2.5rem 1rem;
+        position: relative;
+      }
+
+      .img-viewer {
+        text-align: center;
+        position: relative;
+        width: 100%;
+        height: 62vw;
+        max-height: 70vh;
+        min-height: 260px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eee;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+        user-select: none;
+        touch-action: pan-y;
+      }
+
+      .img-viewer img {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        background: #fff;
+        cursor: pointer;
+        transition: box-shadow 0.2s;
+      }
+
+      .nav-btn,
+      .del-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.15);
+        border: none;
+        color: #fff;
+        font-size: 2rem;
+        border-radius: 50%;
+        width: 2.2rem;
+        height: 2.2rem;
+        cursor: pointer;
+        z-index: 2;
+        transition: background 0.2s;
+      }
+
+      .nav-btn:active,
+      .del-btn:active {
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      .nav-btn.left {
+        left: 0.2rem;
+      }
+
+      .nav-btn.right {
+        right: 0.2rem;
+      }
+
+      .del-btn {
+        top: 10%;
+        right: 0.2rem;
+        font-size: 1.3rem;
+        width: 2rem;
+        height: 2rem;
+        background: rgba(252, 87, 94, 0.8);
+        color: #fff;
+        z-index: 3;
+        transform: none;
+      }
+
+      .img-index {
+        margin: 0.5rem 0 0.2rem 0;
+        color: #888;
+        font-size: 1rem;
+      }
+
+      .input-area {
+        margin: 0.5rem 0 0 0;
+        text-align: center;
+      }
+
+      .input-area input {
+        width: 70%;
+        font-size: 1.2rem;
+        padding: 0.7rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        text-align: center;
+        background: #f7f7f7;
+        transition: border 0.2s;
+      }
+
+      .input-area input:focus {
+        border: 1.5px solid #fc575e;
+        outline: none;
+        background: #fffbe7;
+      }
+
+      .sum-bar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, #fc575e 0%, #f7b42c 100%);
+        color: #fff;
+        font-size: 1.2rem;
+        text-align: center;
+        padding: 0.7rem 0;
+        font-weight: bold;
+        letter-spacing: 1px;
+        z-index: 10;
+      }
+
+      .upload-area {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      .upload-area input[type="file"] {
+        display: none;
+      }
+
+      .upload-label {
+        display: inline-block;
+        background: #fc575e;
+        color: #fff;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 0.5rem;
+        transition: background 0.2s;
+      }
+
+      .upload-label:hover {
+        background: #f7b42c;
+      }
+
+      .fullscreen-mask {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.92);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .fullscreen-mask img {
+        max-width: 98vw;
+        max-height: 98vh;
+        object-fit: contain;
+        border-radius: 12px;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.18);
+        background: #fff;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .fullscreen-mask .close-btn {
+        position: fixed;
+        top: 1.2rem;
+        right: 1.2rem;
+        font-size: 2.2rem;
+        color: #fff;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 10000;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          max-width: 99vw;
+          padding: 0.5rem 0.5rem 2.5rem 0.5rem;
+        }
+
+        .img-viewer {
+          height: 70vw;
+          min-height: 40vw;
+          max-height: 70vw;
+        }
+
+        .img-viewer img {
+          max-height: 100%;
+        }
+
+        .sum-bar {
+          font-size: 1rem;
+          padding: 0.5rem 0;
+        }
+      }
+
+      .back-btn {
+        display: block;
+        width: 90%;
+        max-width: 340px;
+        margin: 1.2rem auto 1.5rem auto;
+        padding: 0.9rem 0;
+        background: linear-gradient(90deg, #ff9800 0%, #fc575e 100%);
+        color: #fff;
+        font-size: 1.15rem;
+        font-weight: bold;
+        border: none;
+        border-radius: 2rem;
+        box-shadow: 0 2px 12px rgba(252, 87, 94, 0.1);
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: background 0.2s, transform 0.15s;
+      }
+
+      .back-btn:hover {
+        background: linear-gradient(90deg, #fc575e 0%, #ff9800 100%);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 4px 18px rgba(252, 87, 94, 0.18);
+      }
+    </style>
+  </head>
+
+  <body>
+    <button class="back-btn" onclick="window.location.href='t.html'">
+      ⬅️ 回到主页面
+    </button>
+    <div class="container">
+      <div class="upload-area">
+        <label class="upload-label">
+          选择图片
+          <input type="file" id="imgInput" accept="image/*" multiple />
+        </label>
+      </div>
+      <div class="img-viewer" id="imgViewer" style="display: none">
+        <button class="nav-btn left" onclick="prevImg()" title="上一张">
+          &#8592;
+        </button>
+        <img id="curImg" src="" alt="产品图片" onclick="openFullscreen()" />
+        <button class="nav-btn right" onclick="nextImg()" title="下一张">
+          &#8594;
+        </button>
+        <button class="del-btn" onclick="deleteImg()" title="删除图片">
+          🗑
+        </button>
+      </div>
+      <div class="img-index" id="imgIndex"></div>
+      <div style="margin: 1rem 0; color: #fc575e; font-weight: bold">
+        今日实际金额：<span id="todayActualShow"></span>
+      </div>
+      <button
+        class="copy-btn"
+        style="
+          display: block;
+          margin: 2rem auto 0 auto;
+          background: #222;
+          color: #fff;
+        "
+        onclick="saveAndGo()"
+      >
+        计算好了 去主页面
+      </button>
+      <div
+        id="summaryBar"
+        style="margin: 1rem 0; color: #fc575e; font-weight: bold"
+      ></div>
+      <div id="inputArea"></div>
+
+      <div
+        id="noImgTip"
+        style="text-align: center; color: #aaa; margin-top: 2rem"
+      >
+        请先上传图片
+      </div>
+    </div>
+
+    <!-- 全屏大图遮罩 -->
+    <div
+      class="fullscreen-mask"
+      id="fullscreenMask"
+      onclick="closeFullscreen(event)"
+    >
+      <img id="fullscreenImg" src="" alt="大图" />
+      <button class="close-btn" onclick="closeFullscreen(event)">
+        &times;
+      </button>
+    </div>
+    <div class="toast" id="toast"></div>
+    <script>
+      window.onload = function () {
+        // 30分钟 = 1800000 毫秒
+        const verified = localStorage.getItem("pw_verified");
+        if (verified === "true" && time && Date.now() - time < 1800000) {
+
+        } else {
+          // 过期或未验证，清除标记
+          localStorage.removeItem("pw_verified");
+          localStorage.removeItem("pw_verified_time");
+          window.location.href='t.html'
+        }
+      };
+      let images = [];
+      let values = [];
+      let cur = 0;
+      // 本地存储key
+      const LS_KEY = "img_viewer_data";
+      window.addEventListener("DOMContentLoaded", function () {
+        var actual = localStorage.getItem("today_actual") || "";
+        document.getElementById("todayActualShow").textContent = actual
+          ? actual
+          : "未填写";
+      });
+
+      function showToast(msg, color) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.style.background =
+          color || "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)";
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 1800);
+      }
+      // 恢复本地数据
+      function loadFromStorage() {
+        const data = localStorage.getItem(LS_KEY);
+        if (data) {
+          try {
+            const obj = JSON.parse(data);
+            images = obj.images || [];
+            values = obj.values || [];
+            cur = 0;
+            if (images.length > 0) {
+              document.getElementById("imgViewer").style.display = "";
+              document.getElementById("inputArea").style.display = "";
+              document.getElementById("noImgTip").style.display = "none";
+              showImg();
+              updateSum();
+            }
+          } catch (e) {}
+        }
+      }
+      function saveToStorage() {
+        localStorage.setItem(LS_KEY, JSON.stringify({ images, values }));
+      }
+
+      // 选择图片追加
+      document
+        .getElementById("imgInput")
+        .addEventListener("change", function (e) {
+          const files = Array.from(e.target.files);
+          if (!files.length) return;
+          let loaded = 0;
+          files.forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+              images.push(ev.target.result);
+              values.push("");
+              loaded++;
+              if (loaded === files.length) {
+                cur = images.length - files.length; // 定位到新加的第一张
+                document.getElementById("imgViewer").style.display = "";
+                document.getElementById("inputArea").style.display = "";
+                document.getElementById("noImgTip").style.display = "none";
+                showImg();
+                updateSum();
+                saveToStorage();
+              }
+            };
+            reader.readAsDataURL(file);
+          });
+          // 清空input，否则连续选同一张图片不会触发change
+          e.target.value = "";
+        });
+
+      function showImg() {
+        if (images.length === 0) return;
+        const img = document.getElementById("curImg");
+        img.src = images[cur]; // 直接赋值base64字符串
+        img.setAttribute("data-url", images[cur]);
+        document.getElementById("imgIndex").textContent = `第 ${cur + 1} / ${
+          images.length
+        } 张`;
+        document.getElementById("imgValue").value = values[cur] || "";
+      }
+
+      function prevImg() {
+        if (cur > 0) {
+          cur--;
+          showImg();
+        }
+      }
+      function nextImg() {
+        if (cur < images.length - 1) {
+          cur++;
+          showImg();
+        }
+      }
+      function setValue(val) {
+        values[cur] = val;
+        updateSum();
+        saveToStorage();
+      }
+      function updateSum() {
+        const sum = values.reduce((acc, v) => acc + (parseFloat(v) || 0), 0);
+        document.getElementById("sumBar").textContent = `总价：${sum} 元`;
+        document.getElementById("sumBar").style.display =
+          images.length > 0 ? "" : "none";
+      }
+
+      // 全屏放大
+      function openFullscreen() {
+        const img = document.getElementById("curImg");
+        const url = img.getAttribute("data-url") || img.src;
+        document.getElementById("fullscreenImg").src = url;
+        document.getElementById("fullscreenMask").style.display = "flex";
+      }
+      function closeFullscreen(e) {
+        // 只在点击遮罩或关闭按钮时关闭
+        if (
+          !e ||
+          e.target === document.getElementById("fullscreenMask") ||
+          e.target.className === "close-btn" ||
+          e.target === document.getElementById("fullscreenImg")
+        ) {
+          document.getElementById("fullscreenMask").style.display = "none";
+        }
+      }
+      document.getElementById("fullscreenMask").onclick = function (e) {
+        closeFullscreen(e);
+      };
+
+      // 滑动切换
+      let startX = 0,
+        endX = 0;
+      const viewer = document.getElementById("imgViewer");
+      viewer.addEventListener("touchstart", function (e) {
+        if (e.touches.length === 1) startX = e.touches[0].clientX;
+      });
+      viewer.addEventListener("touchmove", function (e) {
+        if (e.touches.length === 1) endX = e.touches[0].clientX;
+      });
+      viewer.addEventListener("touchend", function (e) {
+        if (startX && endX) {
+          const dx = endX - startX;
+          if (Math.abs(dx) > 40) {
+            if (dx < 0) nextImg();
+            else prevImg();
+          }
+        }
+        startX = endX = 0;
+      });
+
+      // 删除当前图片
+      function deleteImg() {
+        if (images.length === 0) return;
+        images.splice(cur, 1);
+        values.splice(cur, 1);
+        if (cur >= images.length) cur = images.length - 1;
+        if (images.length === 0) {
+          document.getElementById("imgViewer").style.display = "none";
+          document.getElementById("inputArea").style.display = "none";
+          document.getElementById("noImgTip").style.display = "";
+          document.getElementById("sumBar").style.display = "none";
+          document.getElementById("imgIndex").textContent = "";
+          document.getElementById("imgValue").value = "";
+        } else {
+          showImg();
+          updateSum();
+        }
+        saveToStorage();
+      }
+      window.onload = loadFromStorage;
+
+      // 读取今日实际金额
+      let todayActual = parseFloat(localStorage.getItem("today_actual") || "0");
+
+      // 产品名数组（可自定义）
+      // 初始化
+      let productNames = JSON.parse(
+        localStorage.getItem("product_names") || '["产品A","产品B","产品C"]'
+      ); // 你可以改成实际产品名
+      let productValues = new Array(productNames.length).fill("");
+      function saveProductNames() {
+        localStorage.setItem("product_names", JSON.stringify(productNames));
+      }
+      // 生成输入区
+      function renderInputs() {
+        const inputArea = document.getElementById("inputArea");
+        inputArea.innerHTML = "";
+        productNames.forEach((name, idx) => {
+          // 计算该产品的总金额
+          const nums = (productValues[idx] || "")
+            .split(/,|，|\+/)
+            .map((s) => parseFloat(s) || 0);
+          const prodSum = nums.reduce((a, b) => a + b, 0);
+          let percent = "--";
+          if (todayActual) {
+            let p = (prodSum / todayActual) * 100;
+            percent = Math.round(p) === p ? p.toFixed(0) : p.toFixed(2);
+          }
+          const div = document.createElement("div");
+          div.style.margin = "1.1rem 0";
+          div.innerHTML = `
+            <div>
+                <span 
+                    style="display:inline-block;width:4.5em;cursor:pointer;font-weight:bold;" 
+                    onclick="editProductName(${idx})"
+                    id="productName${idx}"
+                    title="点击修改产品名"
+                    >${name}</span>
+                <input type="text" style="width:60%;font-size:1.1rem;padding:0.5rem;border-radius:6px;border:1px solid #ddd;text-align:center;" 
+                    placeholder="可输入多个金额" 
+                    value="${productValues[idx] || ""}" 
+                    oninput="setValue(${idx}, this.value)">
+            </div>
+            <div style="margin-top:0.5em;display:flex;align-items:center;">
+                <span style="color:#222;font-size:1.08em;">
+                    合计：<span id="sum${idx}">${prodSum}</span> 元　
+                    占比：<span id="percent${idx}">${percent}</span>%
+                </span>
+                <button class="copy-btn single-copy-btn" style="margin-left:1em;" onclick="copySingle(${idx})">复制</button>
+            </div>
+        `;
+          inputArea.appendChild(div);
+        });
+      }
+
+      // 处理输入
+      function setValue(idx, val) {
+        productValues[idx] = val;
+        const nums = (val || "")
+          .split(/,|，|\+/)
+          .map((s) => parseFloat(s) || 0);
+        const prodSum = nums.reduce((a, b) => a + b, 0);
+        let percent = "--";
+        if (todayActual) {
+          let p = (prodSum / todayActual) * 100;
+          percent = Math.round(p) === p ? p.toFixed(0) : p.toFixed(2);
+        }
+        document.getElementById("sum" + idx).textContent = prodSum;
+        document.getElementById("percent" + idx).textContent = percent;
+      }
+      function editProductName(idx) {
+        const span = document.getElementById("productName" + idx);
+        const oldName = productNames[idx];
+        // 创建input
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = oldName;
+        input.style.width = "4.5em";
+        input.style.fontSize = "1em";
+        input.style.textAlign = "center";
+        input.style.borderRadius = "4px";
+        input.style.border = "1px solid #fc575e";
+        input.style.outline = "none";
+        input.onblur = function () {
+          saveNewName();
+        };
+        input.onkeydown = function (e) {
+          if (e.key === "Enter") {
+            input.blur();
+          }
+        };
+        // 替换span为input
+        span.parentNode.replaceChild(input, span);
+        input.focus();
+        input.select();
+
+        function saveNewName() {
+          let newName = input.value.trim();
+          if (!newName) newName = oldName;
+          productNames[idx] = newName;
+          saveProductNames();
+          renderInputs();
+        }
+      }
+      // 计算总额和百分比
+      function updateSummary() {
+        // 支持逗号、英文逗号、加号分隔
+        const sum = productValues.reduce((acc, v) => {
+          if (!v) return acc;
+          return (
+            acc +
+            v.split(/,|，|\\+/).reduce((s, n) => s + (parseFloat(n) || 0), 0)
+          );
+        }, 0);
+        let percent = todayActual
+          ? ((sum / todayActual) * 100).toFixed(2) + "%"
+          : "--";
+        document.getElementById(
+          "summaryBar"
+        ).innerHTML = `总金额：${sum} 元　占今日实际：${percent}`;
+      }
+      function saveAndGo() {
+        // 计算所有有内容的产品的合计和占比
+        const result = [];
+        for (let i = 0; i < productNames.length; i++) {
+          const val = productValues[i];
+          if (val && val.trim() !== "") {
+            const nums = val.split(/,|，|\+/).map((s) => parseFloat(s) || 0);
+            const prodSum = nums.reduce((a, b) => a + b, 0);
+            let percent = "--";
+            if (todayActual) {
+              let p = (prodSum / todayActual) * 100;
+              percent = Math.round(p) === p ? p.toFixed(0) : p.toFixed(2);
+            }
+            result.push({
+              name: productNames[i],
+              sum: prodSum,
+              percent: percent,
+            });
+          }
+        }
+        // 存储到 localStorage
+        localStorage.setItem("img_calc_result", JSON.stringify(result));
+        // 跳转到主页面
+        window.location.href = "t.html";
+      }
+      function copySingle(idx) {
+        const sum = document.getElementById("sum" + idx).textContent;
+        const percent = document.getElementById("percent" + idx).textContent;
+        const text = `${sum} 占比${percent}%`;
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast(
+              "已复制: " + text,
+              "linear-gradient(90deg, #4caf50 0%, #43e97b 100%)"
+            );
+          });
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "absolute";
+          textarea.style.left = "-9999px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            document.execCommand("copy");
+            showToast(
+              "已复制: " + text,
+              "linear-gradient(90deg, #4caf50 0%, #43e97b 100%)"
+            );
+          } catch (err) {
+            showToast(
+              "复制失败，请手动长按结果区域复制",
+              "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)"
+            );
+          }
+          document.body.removeChild(textarea);
+        }
+      }
+      // 页面加载时渲染
+      window.addEventListener("DOMContentLoaded", function () {
+        todayActual = parseFloat(localStorage.getItem("today_actual") || "0");
+        productNames = JSON.parse(
+          localStorage.getItem("product_names") || '["产品A","产品B","产品C"]'
+        );
+        renderInputs();
+      });
+      window.editProductName = editProductName;
+      // 绑定 setValue 到 window（如果用内联 oninput）
+      window.setValue = setValue;
+    </script>
+  </body>
+</html>

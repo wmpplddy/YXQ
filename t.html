@@ -1,238 +1,428 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>叶子偷懒工具</title>
     <style>
-
-        body {
-            font-family: 'Segoe UI', 'PingFang SC', Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #f7b42c 0%, #fc575e 100%);
-            color: #222;
-            min-height: 100vh;
+      body {
+        font-family: "Segoe UI", "PingFang SC", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, #f7b42c 0%, #fc575e 100%);
+        color: #222;
+        min-height: 100vh;
+      }
+      .pw-container {
+        max-width: 340px;
+        margin: 12vh auto 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem 2rem 2rem 2rem;
+        text-align: center;
+        animation: float 2s infinite alternate;
+      }
+      @keyframes float {
+        from {
+          transform: translateY(0);
         }
+        to {
+          transform: translateY(-10px);
+        }
+      }
+      .pw-emoji {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+      .pw-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.2rem;
+        color: #fc575e;
+        letter-spacing: 2px;
+      }
+      .pw-input {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 0.7rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+      .pw-btn {
+        width: 100%;
+        background: #fc575e;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        padding: 0.7rem 0;
+        transition: background 0.2s;
+      }
+      .pw-btn:hover {
+        background: #f7b42c;
+      }
+      #pwmsg {
+        color: #fc575e;
+        margin-top: 0.5rem;
+        min-height: 1.2em;
+      }
+      @media (max-width: 500px) {
         .pw-container {
-            max-width: 340px;
-            margin: 12vh auto 0 auto;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-            padding: 2.5rem 2rem 2rem 2rem;
-            text-align: center;
-            animation: float 2s infinite alternate;
-        }
-        @keyframes float {
-            from { transform: translateY(0); }
-            to { transform: translateY(-10px); }
-        }
-        .pw-emoji {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            display: block;
+          padding: 1.5rem 0.5rem 1rem 0.5rem;
+          max-width: 95vw;
         }
         .pw-title {
-            font-size: 1.5rem;
-            margin-bottom: 1.2rem;
-            color: #fc575e;
-            letter-spacing: 2px;
+          font-size: 1.1rem;
         }
-        .pw-input {
-            width: 100%;
-            font-size: 1.1rem;
-            padding: 0.7rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
+        .pw-emoji {
+          font-size: 2rem;
         }
-        .pw-btn {
-            width: 100%;
-            background: #fc575e;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            padding: 0.7rem 0;
-            transition: background 0.2s;
-        }
-        .pw-btn:hover {
-            background: #f7b42c;
-        }
-        #pwmsg {
-            color: #fc575e;
-            margin-top: 0.5rem;
-            min-height: 1.2em;
-        }
-        @media (max-width: 500px) {
-            .pw-container {
-                padding: 1.5rem 0.5rem 1rem 0.5rem;
-                max-width: 95vw;
-            }
-            .pw-title { font-size: 1.1rem; }
-            .pw-emoji { font-size: 2rem; }
-        }
+      }
+      .container {
+        max-width: 520px;
+        margin: 2rem auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 1.2rem;
+      }
+      label {
+        display: block;
+        margin: 0.8rem 0 0.3rem 0;
+        font-weight: 500;
+      }
+      input,
+      textarea,
+      button {
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.6rem;
+        margin-bottom: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+        max-height: 300px;
+      }
+      button {
+        background: #0078ff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background 0.2s;
+      }
+      button:hover {
+        background: #005fcc;
+      }
+      .result {
+        background: #f0f4fa;
+        border-radius: 6px;
+        padding: 1rem;
+        min-height: 2rem;
+        word-break: break-all;
+        white-space: pre-wrap;
+        margin-top: 2.5rem;
+      }
+      .copy-btn {
+        width: auto;
+        margin-bottom: 0.5rem;
+        float: right;
+        background: #4caf50;
+      }
+      @media (max-width: 600px) {
         .container {
-            max-width: 520px;
-            margin: 2rem auto;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 1.5rem;
+          margin: 0;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 1rem;
         }
-        h2 {
-            text-align: center;
-            margin-bottom: 1.2rem;
-        }
-        label {
-            display: block;
-            margin: 0.8rem 0 0.3rem 0;
-            font-weight: 500;
-        }
-        input, textarea, button {
-            width: 100%;
-            font-size: 1rem;
-            padding: 0.6rem;
-            margin-bottom: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-            max-height: 300px;
-        }
-        button {
-            background: #0078ff;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        button:hover {
-            background: #005fcc;
-        }
-        .result {
-            background: #f0f4fa;
-            border-radius: 6px;
-            padding: 1rem;
-            min-height: 2rem;
-            word-break: break-all;
-            white-space: pre-wrap;
-            margin-top: 1.2rem;
-        }
-        .copy-btn {
-            width: auto;
-            margin-bottom: 0.5rem;
-            float: right;
-            background: #4caf50;
-        }
-        @media (max-width: 600px) {
-            .container {
-                margin: 0;
-                border-radius: 0;
-                box-shadow: none;
-                padding: 1rem;
-            }
-        }
-        .toast {
-            position: fixed;
-            left: 50%;
-            top: 10%;
-            transform: translateX(-50%);
-            background: linear-gradient(90deg, #fc575e 0%, #f7b42c 100%);
-            color: #fff;
-            padding: 1rem 2.2rem;
-            border-radius: 2rem;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .toast.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
+      }
+      .toast {
+        position: fixed;
+        left: 50%;
+        top: 10%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #fc575e 0%, #f7b42c 100%);
+        color: #fff;
+        padding: 1rem 2.2rem;
+        border-radius: 2rem;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .toast.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
     </style>
-</head>
-<body>
- <div id="lock" class="pw-container">
-        <span class="pw-emoji">🔒</span>
-        <div class="pw-title">输入口令~</div>
-        <input id="pw" class="pw-input" type="password" placeholder="请输入专属口令">
-        <button class="pw-btn" onclick="checkPW()">进入</button>
-        <div id="pwmsg"></div>
+  </head>
+  <body>
+    <div id="lock" class="pw-container">
+      <span class="pw-emoji">🔒</span>
+      <div class="pw-title">输入口令~</div>
+      <input
+        id="pw"
+        class="pw-input"
+        type="password"
+        placeholder="请输入专属口令"
+      />
+      <button class="pw-btn" onclick="checkPW()">进入</button>
+      <div id="pwmsg"></div>
     </div>
-<div id="mainContent" style="display:none;">
-<div class="container">
-    <h2>小叶子之偷懒工具篇</h2>
-    <label for="rawInput">1. 粘贴昨日日报原文：</label>
-    <textarea id="rawInput" placeholder="请粘贴昨日的经营日报原文"></textarea>
-    <label for="actualInput">2. 输入今日实际金额：</label>
-    <input id="actualInput" type="number" step="0.01" placeholder="如：12345.67">
-    <label for="tasteInput">3. 输入今日试吃金额：</label>
-    <input id="tasteInput" type="number" step="0.01" placeholder="如：200">
-    <label for="lossInput">4. 输入今日报损金额：</label>
-    <input id="lossInput" type="number" step="0.01" placeholder="如：150">
-    <button onclick="parseReport()">生成今日日报</button>
-    <button class="copy-btn" onclick="copyResult()">复制结果</button>
-    <div class="result" id="result"></div>
-    <div style="margin-top:1.5rem;color:#888;font-size:0.95rem;">
-        <b>使用说明：</b><br>
-        1. 粘贴昨日日报原文<br>
-        2. 输入今日实际、试吃、报损金额<br>
-        3. 点击"生成今日日报"自动替换并计算<br>
-        4. 可一键复制结果
+    <div id="mainContent" style="display: none">
+      <div class="container">
+        <h2>小叶子之偷懒工具篇</h2>
+        <label for="rawInput">1. 粘贴昨日日报原文：</label>
+        <textarea
+          id="rawInput"
+          oninput="saveRawInput()"
+          placeholder="请粘贴昨日的经营日报原文"
+        ></textarea>
+        <label for="actualInput">2. 输入今日实际金额：</label>
+        <input
+          id="actualInput"
+          type="number"
+          step="0.01"
+          oninput="syncActualToStorage()"
+          placeholder="如：12345.67"
+        />
+        <label for="tasteInput">3. 输入今日试吃金额：</label>
+        <input
+          id="tasteInput"
+          type="number"
+          step="0.01"
+          placeholder="如：200"
+        />
+        <label for="lossInput">4. 输入今日报损金额：</label>
+        <input id="lossInput" type="number" step="0.01" placeholder="如：150" />
+        <button onclick="parseReport()">生成今日日报</button>
+        <button
+          onclick="clearAllStorage()"
+        >
+          一键清除所有数据
+        </button>
+        <button class="copy-btn" onclick="copyResult()">复制结果</button>
+        <button
+          class="copy-btn"
+          style="background: #ff9800; margin-left: 8px"
+          onclick="window.location.href='1.html'"
+        >
+          去图片计算
+        </button>
+        <div></div>
+        <div id="imgCalcResultBox" style="margin-top: 10px; display: none">
+          <div style="font-weight: bold; margin-bottom: 0.5rem">
+            图片计算结果
+          </div>
+          <div
+            id="imgCalcResultList"
+            style="
+              background: #f0f4fa;
+              border-radius: 6px;
+              padding: 0;
+              margin-top: 15px;
+              word-break: break-all;
+              white-space: normal;
+              margin-left: auto;
+              margin-right: auto;
+              width: 100%;
+              box-sizing: border-box;
+            "
+          ></div>
+        </div>
+        <div class="result" id="result" contenteditable="true"></div>
+        <div style="margin-top: 1.5rem; color: #888; font-size: 0.95rem">
+          <b>使用说明：</b><br />
+          1. 粘贴昨日日报原文<br />
+          2. 输入今日实际、试吃、报损金额<br />
+          3. 点击"生成今日日报"自动替换并计算<br />
+          4. 可一键复制结果
+        </div>
+      </div>
     </div>
-</div>
-</div>
-<div class="toast" id="toast"></div>
-<script>
-    function showToast(msg, color) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.style.background = color || 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)';
-    toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 1800);
-}
-const hash = 'cXh5'; 
-function checkPW() {
-  const val = document.getElementById('pw').value;
-  const encoded = btoa(val.split('').reverse().join(''));
-  if (encoded === hash) {
-    document.getElementById('lock').style.display = 'none';
-    document.getElementById('mainContent').style.display = '';
-  } else {
-    showToast('口令错误，请重试~', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
-    document.getElementById('pwmsg').innerText = '';
-  }
-}
-    function parseNumber(str) {
+    <div class="toast" id="toast"></div>
+    <script>
+      function clearAllStorage() {
+        localStorage.clear();
+        showToast(
+          "已清除所有本地数据，页面将刷新",
+          "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)"
+        );
+        setTimeout(() => {
+          location.reload();
+        }, 1200);
+      }
+      function saveRawInput() {
+        const val = document.getElementById("rawInput").value;
+        localStorage.setItem("raw_daily_report", val);
+      }
+      document.getElementById("rawInput").addEventListener("paste", saveRawInput);
+      window.onload = function () {
+        // 30分钟 = 1800000 毫秒
+        const verified = localStorage.getItem("pw_verified");
+        const time = parseInt(localStorage.getItem("pw_verified_time"), 10);
+        const savedReport = localStorage.getItem("daily_report_result");
+        const savedRaw = localStorage.getItem("raw_daily_report");
+        if (savedRaw !== null) {
+          document.getElementById("rawInput").value = savedRaw;
+        }
+        if (savedReport) {
+          document.getElementById("result").textContent = savedReport;
+        }
+        if (verified === "true" && time && Date.now() - time < 1800000) {
+          document.getElementById("lock").style.display = "none";
+          document.getElementById("mainContent").style.display = "";
+          const todayActual = localStorage.getItem("today_actual") || "";
+          document.getElementById("actualInput").value = todayActual;
+        } else {
+          // 过期或未验证，清除标记
+          localStorage.removeItem("pw_verified");
+          localStorage.removeItem("pw_verified_time");
+        }
+      };
+      function syncActualToStorage() {
+        const val = document.getElementById("actualInput").value;
+        localStorage.setItem("today_actual", val);
+      }
+      function renderImgCalcResult() {
+        const box = document.getElementById("imgCalcResultBox");
+        const list = document.getElementById("imgCalcResultList");
+        const data = JSON.parse(
+          localStorage.getItem("img_calc_result") || "[]"
+        );
+        if (data.length === 0) {
+          box.style.display = "none";
+          return;
+        }
+        box.style.display = "";
+        let html = "";
+        data.forEach((item) => {
+          const displayLine = `${item.name} ${item.sum} 占比${item.percent}%`;
+          const copyLine = `${item.sum} 占比${item.percent}%`;
+          html += `
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 4px 0 4px;box-sizing:border-box;width:100%;">
+    <span style="font-size:0.98em;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto;">${displayLine}</span>
+    <button class="copy-btn" style="background:#222;color:#fff;padding:2px 10px;font-size:0.92em;line-height:1.1;height:1.7em;min-width:2.5em;flex-shrink:0;" 
+    onclick="replaceProductInResult('${item.name}', '${item.sum} 占比${item.percent}%')">替换</button>
+  </div>
+`;
+        });
+        list.innerHTML = html;
+        // 也可以用 innerHTML 和 <br>，但 textContent 更适合复制
+      }
+
+      function replaceProductInResult(productName, newValue) {
+        const resultDiv = document.getElementById("result");
+        let text = resultDiv.textContent;
+
+        // 匹配“产品名销售目标xx%，达成额: 占比%”或“产品名销售目标xx%，达成额：占比%”
+        // 允许“达成额:”和“达成额：”，允许“占比%”后面有内容
+        const reg = new RegExp(
+          "(\\d+[\\.、．]\\s*)?" +
+            productName +
+            "\\s*销售目标[^\\d\\n]*[\\d.]+%[，,、:： ]*达成额\\s*[:：][^\\n]*",
+          "g"
+        );
+
+        let replaced = false;
+        let replacedLine = "";
+
+        text = text.replace(reg, (match) => {
+          const prefix = match.replace(/(达成额[:：]).*$/, "$1");
+          replaced = true;
+          replacedLine = prefix + newValue;
+          return replacedLine;
+        });
+
+        resultDiv.textContent = text;
+        localStorage.setItem("daily_report_result", text);
+
+        // 替换成功时提示
+        if (replaced) {
+          showToast(
+            "已替换：" + replacedLine,
+            "linear-gradient(90deg, #4caf50 0%, #43e97b 100%)"
+          );
+        } else {
+          showToast(
+            "未找到匹配内容",
+            "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)"
+          );
+        }
+      }
+
+      // 页面加载时自动渲染
+      window.addEventListener("DOMContentLoaded", renderImgCalcResult);
+
+      // 显示toast
+      function showToast(msg, color) {
+        const toast = document.getElementById("toast");
+        toast.textContent = msg;
+        toast.style.background =
+          color || "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)";
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 1800);
+      }
+      const hash = "cXh5";
+      function checkPW() {
+        const val = document.getElementById("pw").value;
+        const encoded = btoa(val.split("").reverse().join(""));
+        if (encoded === hash) {
+          localStorage.setItem("pw_verified", "true");
+          localStorage.setItem("pw_verified_time", Date.now().toString());
+          document.getElementById("lock").style.display = "none";
+          document.getElementById("mainContent").style.display = "";
+        } else {
+          showToast(
+            "口令错误，请重试~",
+            "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)"
+          );
+          document.getElementById("pwmsg").innerText = "";
+        }
+      }
+      function parseNumber(str) {
         if (!str) return 0;
-        return parseFloat((str+'').replace(/[^\d.\-]/g, '')) || 0;
-    }
-    function percent(val, total) {
-        if (!total) return '0%';
-        return (val / total * 100).toFixed(2) + '%';
-    }
-    function parseReport() {
-        const raw = document.getElementById('rawInput').value;
-        const todayActual = parseNumber(document.getElementById('actualInput').value);
-        const todayTaste = parseNumber(document.getElementById('tasteInput').value);
-        const todayLoss = parseNumber(document.getElementById('lossInput').value);
+        return parseFloat((str + "").replace(/[^\d.\-]/g, "")) || 0;
+      }
+      function percent(val, total) {
+        if (!total) return "0%";
+        return ((val / total) * 100).toFixed(2) + "%";
+      }
+      function parseReport() {
+        const raw = document.getElementById("rawInput").value;
+        const todayActual = parseNumber(
+          document.getElementById("actualInput").value
+        );
+        const todayTaste = parseNumber(
+          document.getElementById("tasteInput").value
+        );
+        const todayLoss = parseNumber(
+          document.getElementById("lossInput").value
+        );
         if (!raw.trim() || !todayActual) {
-             showToast('请粘贴日报原文并输入今日实际金额', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
-            return;
+          showToast(
+            "请粘贴日报原文并输入今日实际金额",
+            "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)"
+          );
+          return;
         }
         // 解析昨日数据
         // 今日目标
@@ -242,7 +432,9 @@ function checkPW() {
         const actualMatch = raw.match(/今日实际[:：]\s*([\d.]+)/);
         // 本月指标
         const monthTargetMatch = raw.match(/本月指标[:：]\s*([\d.]+)/);
-        const monthTarget = monthTargetMatch ? parseNumber(monthTargetMatch[1]) : 0;
+        const monthTarget = monthTargetMatch
+          ? parseNumber(monthTargetMatch[1])
+          : 0;
         // 本月达成
         const monthDoneMatch = raw.match(/本月达成[:：]\s*([\d.]+)/);
         const monthDone = monthDoneMatch ? parseNumber(monthDoneMatch[1]) : 0;
@@ -252,58 +444,82 @@ function checkPW() {
         const lossMatch = raw.match(/报损[:：]\s*([\d.]+)/);
         // 报损最高产品
         const lossProductMatch = raw.match(/报损最高产品\+金额[:：]?([^\n]+)/);
-        const lossProduct = lossProductMatch ? lossProductMatch[1].trim() : '';
+        const lossProduct = lossProductMatch ? lossProductMatch[1].trim() : "";
 
         let result = raw;
         // 今日实际
-        result = result.replace(/(今日实际[:：])([\d.]+)(（[\d.%]+）)?/,
-            `$1${todayActual}（${percent(todayActual, todayTarget)}）`);
+        result = result.replace(
+          /(今日实际[:：])([\d.]+)(（[\d.%]+）)?/,
+          `$1${todayActual}（${percent(todayActual, todayTarget)}）`
+        );
         // 本月达成（全局替换）
         const newMonthDone = monthDone + todayActual;
-        result = result.replace(/([\S\s]{0,2}本月达成[:：]\s*)([\d.]+)(（[\d.%]+）)?/g,
-            `$1${newMonthDone}（${percent(newMonthDone, monthTarget)}）`);
+        result = result.replace(
+          /([\S\s]{0,2}本月达成[:：]\s*)([\d.]+)(（[\d.%]+）)?/g,
+          `$1${newMonthDone}（${percent(newMonthDone, monthTarget)}）`
+        );
         // 试吃
-        result = result.replace(/(试吃[:：])([\d.]+)(（[\d.%]+）)?/,
-            `$1${todayTaste}（${percent(todayTaste, todayActual)}）`);
+        result = result.replace(
+          /(试吃[:：])([\d.]+)(（[\d.%]+）)?/,
+          `$1${todayTaste}（${percent(todayTaste, todayActual)}）`
+        );
         // 报损
-        result = result.replace(/(报损[:：])([\d.]+)([（(][\d.%]+[）)])?/,
-            `$1${todayLoss}（${percent(todayLoss, todayActual)}）`);
-        
-        document.getElementById('result').textContent = result;
-    }
-    function copyResult() {
-        const result = document.getElementById('result').textContent;
+        result = result.replace(
+          /(报损[:：])([\d.]+)([（(][\d.%]+[）)])?/,
+          `$1${todayLoss}（${percent(todayLoss, todayActual)}）`
+        );
+        localStorage.setItem("daily_report_result", result);
+
+        document.getElementById("result").textContent = result;
+      }
+      function copyResult() {
+        const result = document.getElementById("result").innerText;
         if (!result) return;
         if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(result).then(() => {
-                showToast('已复制到剪贴板！', 'linear-gradient(90deg, #4caf50 0%, #43e97b 100%)');
-            }).catch(() => {
-                fallbackCopy(result);
+          navigator.clipboard
+            .writeText(result)
+            .then(() => {
+              showToast(
+                "已复制到剪贴板！",
+                "linear-gradient(90deg, #4caf50 0%, #43e97b 100%)"
+              );
+            })
+            .catch(() => {
+              fallbackCopy(result);
             });
         } else {
-            fallbackCopy(result);
+          fallbackCopy(result);
         }
         function fallbackCopy(text) {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            textarea.setAttribute('readonly', '');
-            textarea.style.position = 'absolute';
-            textarea.style.left = '-9999px';
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showToast('已复制到剪贴板！', 'linear-gradient(90deg, #4caf50 0%, #43e97b 100%)');
-                } else {
-                    showToast('复制失败，请手动长按结果区域复制', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
-                }
-            } catch (err) {
-                showToast('复制失败，请手动长按结果区域复制', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "absolute";
+          textarea.style.left = "-9999px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          try {
+            const successful = document.execCommand("copy");
+            if (successful) {
+              showToast(
+                "已复制到剪贴板！",
+                "linear-gradient(90deg, #4caf50 0%, #43e97b 100%)"
+              );
+            } else {
+              showToast(
+                "复制失败，请手动长按结果区域复制",
+                "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)"
+              );
             }
-            document.body.removeChild(textarea);
+          } catch (err) {
+            showToast(
+              "复制失败，请手动长按结果区域复制",
+              "linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)"
+            );
+          }
+          document.body.removeChild(textarea);
         }
-    }
-</script>
-</body>
+      }
+    </script>
+  </body>
 </html>
