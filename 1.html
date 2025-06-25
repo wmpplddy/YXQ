@@ -368,18 +368,7 @@
     </div>
     <div class="toast" id="toast"></div>
     <script>
-      window.onload = function () {
-        // 30分钟 = 1800000 毫秒
-        const verified = localStorage.getItem("pw_verified");
-        if (verified === "true" && time && Date.now() - time < 1800000) {
-
-        } else {
-          // 过期或未验证，清除标记
-          localStorage.removeItem("pw_verified");
-          localStorage.removeItem("pw_verified_time");
-          window.location.href='t.html'
-        }
-      };
+  
       let images = [];
       let values = [];
       let cur = 0;
@@ -404,6 +393,16 @@
       }
       // 恢复本地数据
       function loadFromStorage() {
+         const verified = localStorage.getItem("pw_verified");
+        const time = parseInt(localStorage.getItem("pw_verified_time"), 10);
+        if (verified === "true" && time && Date.now() - time < 1800000) {
+
+        } else {
+          // 过期或未验证，清除标记
+          localStorage.removeItem("pw_verified");
+          localStorage.removeItem("pw_verified_time");
+          window.location.href='start.html'
+        }
         const data = localStorage.getItem(LS_KEY);
         if (data) {
           try {
