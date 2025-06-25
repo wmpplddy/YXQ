@@ -9,8 +9,71 @@
             font-family: 'Segoe UI', 'PingFang SC', Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: #f7f7f7;
+            background: linear-gradient(135deg, #f7b42c 0%, #fc575e 100%);
             color: #222;
+            min-height: 100vh;
+        }
+        .pw-container {
+            max-width: 340px;
+            margin: 12vh auto 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+            padding: 2.5rem 2rem 2rem 2rem;
+            text-align: center;
+            animation: float 2s infinite alternate;
+        }
+        @keyframes float {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+        .pw-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .pw-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            color: #fc575e;
+            letter-spacing: 2px;
+        }
+        .pw-input {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 0.7rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        .pw-btn {
+            width: 100%;
+            background: #fc575e;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            padding: 0.7rem 0;
+            transition: background 0.2s;
+        }
+        .pw-btn:hover {
+            background: #f7b42c;
+        }
+        #pwmsg {
+            color: #fc575e;
+            margin-top: 0.5rem;
+            min-height: 1.2em;
+        }
+        @media (max-width: 500px) {
+            .pw-container {
+                padding: 1.5rem 0.5rem 1rem 0.5rem;
+                max-width: 95vw;
+            }
+            .pw-title { font-size: 1.1rem; }
+            .pw-emoji { font-size: 2rem; }
         }
         .container {
             max-width: 520px;
@@ -81,11 +144,13 @@
 </head>
 <script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>
 <body>
-    <div id="lock" style="text-align:center;">
-  <input id="pw" type="password" placeholder="请输入口令">
-  <button onclick="checkPW()">进入</button>
-  <div id="pwmsg" style="color:red;"></div>
-</div>
+ <div id="lock" class="pw-container">
+        <span class="pw-emoji">🔒</span>
+        <div class="pw-title">进入前请验证口令</div>
+        <input id="pw" class="pw-input" type="password" placeholder="请输入专属口令">
+        <button class="pw-btn" onclick="checkPW()">进入</button>
+        <div id="pwmsg"></div>
+    </div>
 <div id="mainContent" style="display:none;">
 <div class="container">
     <h2>小叶子之偷懒工具篇</h2>
