@@ -178,7 +178,7 @@ const hash = 'cXh5';
 function checkPW() {
   const val = document.getElementById('pw').value;
   const encoded = btoa(val.split('').reverse().join(''));
-  if (encoded === secret) {
+  if (encoded === hash) {
     document.getElementById('lock').style.display = 'none';
     document.getElementById('mainContent').style.display = '';
   } else {
