@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>叶子偷懒工具</title>
     <style>
+
         body {
             font-family: 'Segoe UI', 'PingFang SC', Arial, sans-serif;
             margin: 0;
@@ -140,6 +141,26 @@
                 padding: 1rem;
             }
         }
+        .toast {
+            position: fixed;
+            left: 50%;
+            top: 10%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #fc575e 0%, #f7b42c 100%);
+            color: #fff;
+            padding: 1rem 2.2rem;
+            border-radius: 2rem;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
@@ -173,7 +194,17 @@
     </div>
 </div>
 </div>
+<div class="toast" id="toast"></div>
 <script>
+    function showToast(msg, color) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.background = color || 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)';
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 1800);
+}
 const hash = 'cXh5'; 
 function checkPW() {
   const val = document.getElementById('pw').value;
@@ -182,7 +213,8 @@ function checkPW() {
     document.getElementById('lock').style.display = 'none';
     document.getElementById('mainContent').style.display = '';
   } else {
-    document.getElementById('pwmsg').innerText = '口令错误，请重试~';
+    showToast('口令错误，请重试~', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
+    document.getElementById('pwmsg').innerText = '';
   }
 }
     function parseNumber(str) {
@@ -199,10 +231,10 @@ function checkPW() {
         const todayTaste = parseNumber(document.getElementById('tasteInput').value);
         const todayLoss = parseNumber(document.getElementById('lossInput').value);
         if (!raw.trim() || !todayActual) {
-            document.getElementById('result').textContent = '请粘贴日报原文并输入今日实际金额';
+             showToast('请粘贴日报原文并输入今日实际金额', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
             return;
         }
-        // 1. 解析昨日数据
+        // 解析昨日数据
         // 今日目标
         const targetMatch = raw.match(/今日目标[:：]\s*([\d.]+)/);
         const todayTarget = targetMatch ? parseNumber(targetMatch[1]) : 0;
@@ -221,12 +253,12 @@ function checkPW() {
         // 报损最高产品
         const lossProductMatch = raw.match(/报损最高产品\+金额[:：]?([^\n]+)/);
         const lossProduct = lossProductMatch ? lossProductMatch[1].trim() : '';
-        // 2. 替换文本
+
         let result = raw;
         // 今日实际
         result = result.replace(/(今日实际[:：])([\d.]+)(（[\d.%]+）)?/,
             `$1${todayActual}（${percent(todayActual, todayTarget)}）`);
-        // 本月达成（全局替换，支持前面有符号如👆，后面有无百分比都可）
+        // 本月达成（全局替换）
         const newMonthDone = monthDone + todayActual;
         result = result.replace(/([\S\s]{0,2}本月达成[:：]\s*)([\d.]+)(（[\d.%]+）)?/g,
             `$1${newMonthDone}（${percent(newMonthDone, monthTarget)}）`);
@@ -236,16 +268,15 @@ function checkPW() {
         // 报损
         result = result.replace(/(报损[:：])([\d.]+)([（(][\d.%]+[）)])?/,
             `$1${todayLoss}（${percent(todayLoss, todayActual)}）`);
-        // 其余内容保持不变
+        
         document.getElementById('result').textContent = result;
     }
     function copyResult() {
         const result = document.getElementById('result').textContent;
         if (!result) return;
-        // 优先使用 clipboard API
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(result).then(() => {
-                alert('已复制到剪贴板！');
+                showToast('已复制到剪贴板！', 'linear-gradient(90deg, #4caf50 0%, #43e97b 100%)');
             }).catch(() => {
                 fallbackCopy(result);
             });
@@ -263,12 +294,12 @@ function checkPW() {
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    alert('已复制到剪贴板！');
+                    showToast('已复制到剪贴板！', 'linear-gradient(90deg, #4caf50 0%, #43e97b 100%)');
                 } else {
-                    alert('复制失败，请手动长按结果区域复制');
+                    showToast('复制失败，请手动长按结果区域复制', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
                 }
             } catch (err) {
-                alert('复制失败，请手动长按结果区域复制');
+                showToast('复制失败，请手动长按结果区域复制', 'linear-gradient(90deg, #fc575e 0%, #f7b42c 100%)');
             }
             document.body.removeChild(textarea);
         }
