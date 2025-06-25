@@ -80,6 +80,12 @@
     </style>
 </head>
 <body>
+    <div id="lock" style="text-align:center;">
+  <input id="pw" type="password" placeholder="请输入口令">
+  <button onclick="checkPW()">进入</button>
+  <div id="pwmsg" style="color:red;"></div>
+</div>
+<div id="mainContent" style="display:none;">
 <div class="container">
     <h2>小叶子之偷懒工具篇</h2>
     <label for="rawInput">1. 粘贴昨日日报原文：</label>
@@ -101,7 +107,21 @@
         4. 可一键复制结果
     </div>
 </div>
+</div>
 <script>
+    const hash = '6cf8fa2301f042a451ecd67afce6e2475b36f8a2a0670dcc47bd9f5b4d31c35a'; 
+async function checkPW() {
+  const val = document.getElementById('pw').value;
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(val));
+  const inputHash = Array.from(new Uint8Array(buf)).map(x => x.toString(16).padStart(2, '0')).join('');
+  if (inputHash === hash) {
+    document.getElementById('lock').style.display = 'none';
+    document.getElementById('mainContent').style.display = '';
+  } else {
+    document.getElementById('pwmsg').innerText = '口令错误';
+  }
+}
+    
     function parseNumber(str) {
         if (!str) return 0;
         return parseFloat((str+'').replace(/[^\d.\-]/g, '')) || 0;
