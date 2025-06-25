@@ -280,85 +280,83 @@
         window._heartsStarted = true;
 
         function createFloatingHeart() {
-  // 容器
-  const container = document.createElement("div");
-  container.className = "floating-heart-container";
-  const startLeft = Math.random() * 90 + 2;
-  const size = Math.random() * 18 + 18;
-  container.style.left = startLeft + "vw";
-  container.style.top = "100vh";
-  container.style.width = size + "px";
-  container.style.height = size + "px";
-  container.style.pointerEvents = "none";
-  container.style.position = "fixed";
-  container.style.zIndex = "0";
-  container.style.overflow = "visible";
+          // 容器
+          const container = document.createElement("div");
+          container.className = "floating-heart-container";
+          const startLeft = Math.random() * 90 + 2;
+          const size = Math.random() * 18 + 18;
+          container.style.left = startLeft + "vw";
+          container.style.top = "0";
+          container.style.width = size + "px";
+          container.style.height = size + "px";
+          container.style.pointerEvents = "none";
+          container.style.position = "fixed";
+          container.style.zIndex = "0";
+          container.style.overflow = "visible";
 
-  // 主爱心
-  const heart = document.createElement("div");
-  heart.className = "floating-heart";
-  const colors = [
-    "#fc575e",
-    "#f7b42c",
-    "#ff80ab",
-    "#43e97b",
-    "#0078ff",
-  ];
-  const color = colors[Math.floor(Math.random() * colors.length)];
-  heart.style.color = color;
-  heart.style.fontSize = size + "px";
-  heart.style.position = "absolute";
-  heart.style.left = "50%";
-  heart.style.transform = "translateX(-50%)";
-    heart.style.top = "0";
-  heart.style.opacity = Math.random() * 0.4 + 0.6;
-  
-  container.appendChild(heart);
+          // 主爱心
+          const heart = document.createElement("div");
+          heart.className = "floating-heart";
+          const colors = [
+            "#fc575e",
+            "#f7b42c",
+            "#ff80ab",
+            "#43e97b",
+            "#0078ff",
+          ];
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          heart.style.color = color;
+          heart.style.fontSize = size + "px";
+          heart.style.position = "absolute";
+          heart.style.left = "50%";
+          heart.style.transform = "translateX(-50%)";
+          heart.style.top = "0";
+          heart.style.opacity = Math.random() * 0.4 + 0.6;
 
-  // 拖尾
-  const tailCount = 8;
-  for (let i = 1; i <= tailCount; i++) {
-  const tail = document.createElement("div");
-  tail.className = "floating-heart-tail";
-  tail.innerHTML = "❤";
-  tail.style.position = "absolute";
-  tail.style.left = "50%";
-  tail.style.transform = "translateX(-50%)";
-  tail.style.top = `${i * (size * 0.45)}px`;
-  tail.style.fontSize = size * (1 - i * 0.09) + "px";
-  tail.style.opacity = 0.5 * (1 - i / (tailCount + 1));
-  tail.style.color = color;
-  container.appendChild(tail);
-}
+          container.appendChild(heart);
 
-  document.body.appendChild(container);
+          // 拖尾
+          const tailCount = 8;
+          for (let i = 1; i <= tailCount; i++) {
+            const tail = document.createElement("div");
+            tail.className = "floating-heart-tail";
+            tail.innerHTML = "❤";
+            tail.style.position = "absolute";
+            tail.style.left = "50%";
+            tail.style.transform = "translateX(-50%)";
+            tail.style.top = `${i * (size * 0.45)}px`;
+            tail.style.fontSize = size * (1 - i * 0.09) + "px";
+            tail.style.opacity = 0.5 * (1 - i / (tailCount + 1));
+            tail.style.color = color;
+            container.appendChild(tail);
+          }
 
-  // 动画
-  const duration = Math.random() * 2 + 3; // 3~5秒
-  const startY = window.innerHeight;
-  const endY = -0.1 * window.innerHeight;
-  const deltaY = endY - startY;
-  const scaleEnd = Math.random() * 0.5 + 0.8;
+          document.body.appendChild(container);
 
-  container.animate(
-    [
-      { transform: `translateY(0) scale(1)`, opacity: 1 },
-      {
-        transform: `translateY(${deltaY}px) scale(${scaleEnd})`,
-        opacity: 0.2,
-      },
-    ],
-    {
-      duration: duration * 1000,
-      easing: "cubic-bezier(.17,.67,.83,.67)",
-      fill: "forwards",
-    }
-  );
+          const duration = Math.random() * 2 + 3; // 3~5秒
+          const startY = window.innerHeight;
+          const endY = -0.1 * window.innerHeight;
+          const scaleEnd = Math.random() * 0.5 + 0.8;
 
-  setTimeout(() => {
-    container.remove();
-  }, duration * 1000);
-}
+          container.animate(
+            [
+              { transform: `translateY(${startY}px) scale(1)`, opacity: 1 },
+              {
+                transform: `translateY(${endY}px) scale(${scaleEnd})`,
+                opacity: 0.2,
+              },
+            ],
+            {
+              duration: duration * 1000,
+              easing: "cubic-bezier(.17,.67,.83,.67)",
+              fill: "forwards",
+            }
+          );
+
+          setTimeout(() => {
+            container.remove();
+          }, duration * 1000);
+        }
 
         // CSS只插入一次
         if (!document.getElementById("floating-heart-style")) {
