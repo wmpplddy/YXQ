@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叶子偷懒工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f7f7f7;
+            color: #222;
+        }
+        .container {
+            max-width: 520px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 1.2rem;
+        }
+        label {
+            display: block;
+            margin: 0.8rem 0 0.3rem 0;
+            font-weight: 500;
+        }
+        input, textarea, button {
+            width: 100%;
+            font-size: 1rem;
+            padding: 0.6rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            max-height: 300px;
+        }
+        button {
+            background: #0078ff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #005fcc;
+        }
+        .result {
+            background: #f0f4fa;
+            border-radius: 6px;
+            padding: 1rem;
+            min-height: 2rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            margin-top: 1.2rem;
+        }
+        .copy-btn {
+            width: auto;
+            margin-bottom: 0.5rem;
+            float: right;
+            background: #4caf50;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>小叶子之偷懒工具篇</h2>
+    <label for="rawInput">1. 粘贴昨日日报原文：</label>
+    <textarea id="rawInput" placeholder="请粘贴昨日的经营日报原文"></textarea>
+    <label for="actualInput">2. 输入今日实际金额：</label>
+    <input id="actualInput" type="number" step="0.01" placeholder="如：12345.67">
+    <label for="tasteInput">3. 输入今日试吃金额：</label>
+    <input id="tasteInput" type="number" step="0.01" placeholder="如：200">
+    <label for="lossInput">4. 输入今日报损金额：</label>
+    <input id="lossInput" type="number" step="0.01" placeholder="如：150">
+    <button onclick="parseReport()">生成今日日报</button>
+    <button class="copy-btn" onclick="copyResult()">复制结果</button>
+    <div class="result" id="result"></div>
+    <div style="margin-top:1.5rem;color:#888;font-size:0.95rem;">
+        <b>使用说明：</b><br>
+        1. 粘贴昨日日报原文<br>
+        2. 输入今日实际、试吃、报损金额<br>
+        3. 点击"生成今日日报"自动替换并计算<br>
+        4. 可一键复制结果
+    </div>
+</div>
+<script>
+    function parseNumber(str) {
+        if (!str) return 0;
+        return parseFloat((str+'').replace(/[^\d.\-]/g, '')) || 0;
+    }
+    function percent(val, total) {
+        if (!total) return '0%';
+        return (val / total * 100).toFixed(2) + '%';
+    }
+    function parseReport() {
+        const raw = document.getElementById('rawInput').value;
+        const todayActual = parseNumber(document.getElementById('actualInput').value);
+        const todayTaste = parseNumber(document.getElementById('tasteInput').value);
+        const todayLoss = parseNumber(document.getElementById('lossInput').value);
+        if (!raw.trim() || !todayActual) {
+            document.getElementById('result').textContent = '请粘贴日报原文并输入今日实际金额';
+            return;
+        }
+        // 1. 解析昨日数据
+        // 今日目标
+        const targetMatch = raw.match(/今日目标[:：]\s*([\d.]+)/);
+        const todayTarget = targetMatch ? parseNumber(targetMatch[1]) : 0;
+        // 昨日实际
+        const actualMatch = raw.match(/今日实际[:：]\s*([\d.]+)/);
+        // 本月指标
+        const monthTargetMatch = raw.match(/本月指标[:：]\s*([\d.]+)/);
+        const monthTarget = monthTargetMatch ? parseNumber(monthTargetMatch[1]) : 0;
+        // 本月达成
+        const monthDoneMatch = raw.match(/本月达成[:：]\s*([\d.]+)/);
+        const monthDone = monthDoneMatch ? parseNumber(monthDoneMatch[1]) : 0;
+        // 试吃
+        const tasteMatch = raw.match(/试吃[:：]\s*([\d.]+)/);
+        // 报损
+        const lossMatch = raw.match(/报损[:：]\s*([\d.]+)/);
+        // 报损最高产品
+        const lossProductMatch = raw.match(/报损最高产品\+金额[:：]?([^\n]+)/);
+        const lossProduct = lossProductMatch ? lossProductMatch[1].trim() : '';
+        // 2. 替换文本
+        let result = raw;
+        // 今日实际
+        result = result.replace(/(今日实际[:：])([\d.]+)(（[\d.%]+）)?/,
+            `$1${todayActual}（${percent(todayActual, todayTarget)}）`);
+        // 本月达成（全局替换，支持前面有符号如👆，后面有无百分比都可）
+        const newMonthDone = monthDone + todayActual;
+        result = result.replace(/([\S\s]{0,2}本月达成[:：]\s*)([\d.]+)(（[\d.%]+）)?/g,
+            `$1${newMonthDone}（${percent(newMonthDone, monthTarget)}）`);
+        // 试吃
+        result = result.replace(/(试吃[:：])([\d.]+)(（[\d.%]+）)?/,
+            `$1${todayTaste}（${percent(todayTaste, todayActual)}）`);
+        // 报损
+        result = result.replace(/(报损[:：])([\d.]+)([（(][\d.%]+[）)])?/,
+            `$1${todayLoss}（${percent(todayLoss, todayActual)}）`);
+        // 其余内容保持不变
+        document.getElementById('result').textContent = result;
+    }
+    function copyResult() {
+        const result = document.getElementById('result').textContent;
+        if (!result) return;
+        // 优先使用 clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(result).then(() => {
+                alert('已复制到剪贴板！');
+            }).catch(() => {
+                fallbackCopy(result);
+            });
+        } else {
+            fallbackCopy(result);
+        }
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.setAttribute('readonly', '');
+            textarea.style.position = 'absolute';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('已复制到剪贴板！');
+                } else {
+                    alert('复制失败，请手动长按结果区域复制');
+                }
+            } catch (err) {
+                alert('复制失败，请手动长按结果区域复制');
+            }
+            document.body.removeChild(textarea);
+        }
+    }
+</script>
+</body>
+</html>
