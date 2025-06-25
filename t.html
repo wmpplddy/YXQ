@@ -174,84 +174,15 @@
 </div>
 </div>
 <script>
-function sha256(ascii) {
-    function rightRotate(v, a) { return (v>>>a) | (v<<(32-a)); }
-    var mathPow = Math.pow, maxWord = Math.pow(2, 32), result = '', i, j;
-    var words = [], asciiBitLength = ascii.length*8;
-    var hash = sha256.h = sha256.h || [];
-    var k = sha256.k = sha256.k || [];
-    var primeCounter = k.length;
-    var isComposite = {};
-    function isPrime(n) {
-        if (n < 2) return false;
-        if (n === 2) return true;
-        if (n % 2 === 0) return false;
-        for (var i = 3; i*i <= n; i += 2) if (n % i === 0) return false;
-        return true;
-    }
-    if (!k.length) {
-        var n = 2;
-        while (primeCounter < 64) {
-            if (isPrime(n)) {
-                hash[primeCounter] = (mathPow(n, .5)*maxWord)|0;
-                k[primeCounter++] = (mathPow(n, 1/3)*maxWord)|0;
-            }
-            n++;
-        }
-    }
-    ascii += '\x80';
-    while (ascii.length%64 - 56) ascii += '\x00';
-    for (i=0; i<ascii.length; i++) {
-        j = ascii.charCodeAt(i);
-        if (j>>8) return; // ASCII only
-        words[i>>2] |= j << ((3-i)%4)*8;
-    }
-    words[words.length] = ((asciiBitLength/Math.pow(2,32))|0);
-    words[words.length] = (asciiBitLength)
-    for (j=0; j<words.length;) {
-        var w = words.slice(j, j += 16), oldHash = hash.slice(0), i, temp1, temp2;
-        for (i=16; i<64; i++) {
-            var s0 = rightRotate(w[i-15],7) ^ rightRotate(w[i-15],18) ^ (w[i-15]>>>3);
-            var s1 = rightRotate(w[i-2],17) ^ rightRotate(w[i-2],19) ^ (w[i-2]>>>10);
-            w[i] = (w[i-16] + s0 + w[i-7] + s1)|0;
-        }
-        var a = hash[0], b = hash[1], c = hash[2], d = hash[3], e = hash[4], f = hash[5], g = hash[6], h = hash[7];
-        for (i=0; i<64; i++) {
-            var S1 = rightRotate(e,6) ^ rightRotate(e,11) ^ rightRotate(e,25);
-            var ch = (e & f) ^ (~e & g);
-            var temp1 = (h + S1 + ch + k[i] + w[i])|0;
-            var S0 = rightRotate(a,2) ^ rightRotate(a,13) ^ rightRotate(a,22);
-            var maj = (a & b) ^ (a & c) ^ (b & c);
-            var temp2 = (S0 + maj)|0;
-            h = g; g = f; f = e; e = (d + temp1)|0;
-            d = c; c = b; b = a; a = (temp1 + temp2)|0;
-        }
-        hash[0] = (hash[0] + a)|0;
-        hash[1] = (hash[1] + b)|0;
-        hash[2] = (hash[2] + c)|0;
-        hash[3] = (hash[3] + d)|0;
-        hash[4] = (hash[4] + e)|0;
-        hash[5] = (hash[5] + f)|0;
-        hash[6] = (hash[6] + g)|0;
-        hash[7] = (hash[7] + h)|0;
-    }
-    for (i=0; i<hash.length; i++) {
-        for (j=3; j+1; j--) {
-            var b = (hash[i]>>(j*8))&255;
-            result += ((b>>4).toString(16)) + ((b&0xf).toString(16));
-        }
-    }
-    return result;
-}
-const hash = '6cf8fa2301f042a451ecd67afce6e2475b36f8a2a0670dcc47bd9f5b4d31c35acbbb9d5d629a292a9159015a152fecd8673326678eb44a87db0c2e0d47b5481dae5f9156cf6c85d32f73477d6d1826ca8b43d457e360b5961c4560026f196331d94ebeb10cc4a611261dc1f25815a7be70b7ed67a1513c6944f93635720dcdfdb467369eca320b7534e0d42e49c7d9bd87abb9f2c463a2fcec3fc3f327277f6d610bebf27420b49ed1fd8a33e4773594092197f61b530c95869d6342eee52e4f1107668921fba37b43ab9fb675a9f91d86305019d7cd817307fe00ff379f513f66b651a8764ab842a4b06be1c3578c15d2962a531e039f40857b7beea29bf2de'; 
+const hash = 'cXh5'; 
 function checkPW() {
   const val = document.getElementById('pw').value;
-  const inputHash = sha256(val); // 用 js-sha256 计算哈希
-  if (inputHash === hash) {
+  const encoded = btoa(val.split('').reverse().join(''));
+  if (encoded === secret) {
     document.getElementById('lock').style.display = 'none';
     document.getElementById('mainContent').style.display = '';
   } else {
-    document.getElementById('pwmsg').innerText = '口令错误';
+    document.getElementById('pwmsg').innerText = '口令错误，请重试~';
   }
 }
     function parseNumber(str) {
